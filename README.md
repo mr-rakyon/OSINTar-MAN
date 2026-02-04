@@ -50,7 +50,10 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/osint-intelligence-pro.git
-cd osint-intelligence-pro
+https://github.com/mr-rakyon/OSINTar-MAN.git
+cd OSINTar-MAN
+python3 -m venv osintenv
+source osintenv/bin/activate
 pip install -r requirements.txt
 playwright install 
+
