@@ -1,0 +1,2897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Pro | Advanced Intelligence Platform</title>
+    
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vis-network/styles/vis-network.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.css">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0c14;
+            --bg-secondary: #151a27;
+            --bg-card: #1d2436;
+            --bg-dark: #0d1119;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8d0;
+            --accent: #00d4ff;
+            --accent-secondary: #7c4dff;
+            --danger: #ff4081;
+            --success: #00e676;
+            --warning: #ff9100;
+            --info: #2979ff;
+            --border-radius: 16px;
+            --shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1525 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container-fluid {
+            max-width: 1920px;
+            padding: 24px;
+        }
+        
+        /* Header */
+        .main-header {
+            background: linear-gradient(90deg, var(--bg-secondary) 0%, #1a2240 100%);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #000;
+            box-shadow: var(--glow);
+        }
+        
+        .logo-text h1 {
+            color: var(--text-primary);
+            margin: 0;
+            font-weight: 700;
+            font-size: 28px;
+            background: linear-gradient(90deg, var(--accent) 0%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin: 4px 0 0 0;
+            opacity: 0.8;
+        }
+        
+        /* Search Form */
+        #searchForm {
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        #searchForm::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            border-radius: calc(var(--border-radius) + 2px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+        
+        #queryInput {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: none;
+            padding: 20px 30px;
+            font-size: 17px;
+            border-radius: 0;
+            height: 70px;
+        }
+        
+        #queryInput:focus {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+            outline: none;
+        }
+        
+        #searchForm button {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            color: #000;
+            border: none;
+            padding: 0 50px;
+            font-weight: 700;
+            font-size: 17px;
+            transition: var(--transition);
+            border-radius: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        #searchForm button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
+        }
+        
+        /* Advanced Options */
+        .advanced-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .advanced-panel.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .toggle-advanced {
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border-radius: 30px;
+        }
+        
+        .toggle-advanced:hover {
+            background: var(--bg-card);
+            transform: translateY(-2px);
+        }
+        
+        .search-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .option-group {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .option-group label {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .dashboard-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .dashboard-card h6 {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dashboard-card .value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-card .trend {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .trend.positive {
+            color: var(--success);
+        }
+        
+        .trend.negative {
+            color: var(--danger);
+        }
+        
+        /* Toolbar */
+        .main-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            padding: 24px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        #typeFilter {
+            min-width: 220px;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .action-btn:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+        
+        #stats {
+            background: var(--bg-dark);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-width: 300px;
+        }
+        
+        /* Results Panel */
+        .results-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 750px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-header h5 {
+            margin: 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+        }
+        
+        .view-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px;
+        }
+        
+        .view-btn.active {
+            background: var(--accent);
+            color: #000;
+            box-shadow: var(--glow);
+        }
+        
+        #results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #222;
+        }
+        
+        #results.list-view {
+            display: block;
+        }
+        
+        #results.grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        
+        .result-card {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            transition: var(--transition);
+            border-left: 5px solid var(--accent);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-left-color: var(--accent-secondary);
+        }
+        
+        .result-card-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .result-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .result-card-body {
+            padding: 20px;
+        }
+        
+        .result-title {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .result-snippet {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .result-link {
+            font-size: 14px;
+            color: var(--accent);
+            word-break: break-all;
+            margin-bottom: 15px;
+            display: block;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .badge-type {
+            font-size: 13px;
+            background: rgba(124, 77, 255, 0.15);
+            color: var(--accent-secondary);
+            padding: 6px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        /* Network Visualization */
+        #resultMap {
+            height: 750px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+        
+        .network-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .network-btn {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .network-btn:hover {
+            background: var(--accent);
+            color: #000;
+            transform: scale(1.1);
+        }
+        
+        /* Analytics Panel */
+        .analytics-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .analytics-panel.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin-top: 25px;
+            position: relative;
+        }
+        
+        /* Intelligence Panel */
+        .intelligence-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .intelligence-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        /* Report Panel */
+        .report-panel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .report-panel.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .ai-toggle {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .ai-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+        
+        .ai-panel {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            width: 450px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: none;
+        }
+        
+        .ai-panel.active {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tooltip */
+        .tooltip-custom {
+            position: absolute;
+            display: none;
+            background: rgba(21, 26, 39, 0.95);
+            color: #fff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            z-index: 10000;
+            max-width: 450px;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 12, 20, 0.98);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .spinner-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 8px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .spinner:nth-child(2) {
+            border-top-color: var(--accent-secondary);
+            animation-delay: 0.2s;
+        }
+        
+        .spinner:nth-child(3) {
+            border-top-color: var(--success);
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Risk Indicators */
+        .risk-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .risk-high { background-color: var(--danger); }
+        .risk-medium { background-color: var(--warning); }
+        .risk-low { background-color: var(--success); }
+        
+        /* Confidence Meter */
+        .confidence-meter {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Profile Management */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 11000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .profile-modal.active {
+            display: flex;
+        }
+        
+        .profile-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .main-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-section, .quick-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            #resultMap, .results-panel {
+                height: 550px;
+            }
+            
+            .ai-panel {
+                width: 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #results.grid-view {
+                grid-template-columns: 1fr;
+            }
+            
+            .container-fluid {
+                padding: 16px;
+            }
+            
+            .ai-panel {
+                width: calc(100vw - 60px);
+                right: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner"></div>
+            <div class="spinner"></div>
+        </div>
+        <h4 class="mt-4" style="color: var(--accent);" id="loadingText">Initializing OSINT Search...</h4>
+        <p class="text-muted mt-2" id="loadingSubtext">Connecting to search engines...</p>
+        <div class="progress mt-4" style="width: 300px; height: 6px; background: var(--bg-secondary); border-radius: 3px;">
+            <div id="loadingProgress" class="bg-accent" style="height: 100%; width: 0%; border-radius: 3px; transition: width 0.3s ease;"></div>
+        </div>
+    </div>
+    
+    <!-- Profile Management Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5><i class="fas fa-user-cog me-2"></i> Search Profiles</h5>
+                <button class="view-btn" onclick="closeProfileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="profileList">
+                <!-- Profiles will be loaded here -->
+            </div>
+            <div class="mt-4">
+                <button class="action-btn w-100" onclick="createNewProfile()">
+                    <i class="fas fa-plus me-2"></i> Create New Profile
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="main-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>OSINT Intelligence Pro</h1>
+                            <p>Advanced Open Source Intelligence Platform</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex gap-3 justify-content-md-end flex-wrap">
+                        <button class="action-btn" onclick="toggleTheme()">
+                            <i class="fas fa-palette"></i> Theme
+                        </button>
+                        <button class="action-btn" onclick="showSettings()">
+                            <i class="fas fa-cog"></i> Settings
+                        </button>
+                        <button class="action-btn" onclick="openProfileModal()">
+                            <i class="fas fa-user-cog"></i> Profiles
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <form id="searchForm" class="input-group">
+                    <input id="queryInput" class="form-control" placeholder="Enter name, company, domain, email, phone number, social media handle..." required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search me-2"></i> Advanced OSINT Search
+                    </button>
+                </form>
+                
+                <div class="toggle-advanced" onclick="toggleAdvancedPanel()">
+                    <i class="fas fa-sliders-h"></i> Advanced Search Options
+                    <span class="badge bg-accent ms-2" id="activeFilters">0</span>
+                </div>
+                
+                <div class="advanced-panel" id="advancedPanel">
+                    <div class="search-options-grid">
+                        <div class="option-group">
+                            <label><i class="fas fa-search me-2"></i> Search Engine</label>
+                            <select class="form-select" id="searchEngine">
+                                <option value="duckduckgo">DuckDuckGo (Default)</option>
+                                <option value="google">Google</option>
+                                <option value="bing">Bing</option>
+                            </select>
+                            <div class="mt-3">
+                                <label class="form-label">Search Pages:</label>
+                                <input type="range" class="form-range" id="searchPages" min="1" max="10" value="2">
+                                <div class="d-flex justify-content-between">
+                                    <small>1 Page</small>
+                                    <span id="pagesValue" class="fw-bold">2 Pages</span>
+                                    <small>10 Pages</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label><i class="fas fa-filter me-2"></i> Filters & Analysis</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableAnalytics" checked>
+                                <label class="form-check-label" for="enableAnalytics">Enable Analytics</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableRiskAssessment" checked>
+                                <label class="form-check-label" for="enableRiskAssessment">Risk Assessment</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableConfidenceScoring" checked>
+                                <label class="form-check-label" for="enableConfidenceScoring">Confidence Scoring</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableRelevanceScoring" checked>
+                                <label class="form-check-label" for="enableRelevanceScoring">Relevance Scoring</label>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label><i class="fas fa-robot me-2"></i> AI Features</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="aiAutoCategorize" checked>
+                                <label class="form-check-label" for="aiAutoCategorize">Auto-categorize</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="aiPatternRecognition" checked>
+                                <label class="form-check-label" for="aiPatternRecognition">Pattern Recognition</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="aiThreatDetection">
+                                <label class="form-check-label" for="aiThreatDetection">Threat Detection</label>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">AI Analysis Level:</label>
+                                <input type="range" class="form-range" id="aiAnalysisLevel" min="1" max="3" value="2">
+                                <div class="d-flex justify-content-between">
+                                    <small>Basic</small>
+                                    <span id="aiLevelValue" class="fw-bold">Standard</span>
+                                    <small>Advanced</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label><i class="fas fa-shield-alt me-2"></i> Privacy & Security</label>
+                            <select class="form-select" id="privacyLevel">
+                                <option value="normal">Normal Privacy</option>
+                                <option value="enhanced" selected>Enhanced Privacy</option>
+                                <option value="maximum">Maximum Privacy</option>
+                            </select>
+                            <div class="mt-3">
+                                <label class="form-label">Result Limit:</label>
+                                <input type="range" class="form-range" id="resultLimit" min="10" max="100" value="50">
+                                <div class="d-flex justify-content-between">
+                                    <small>10</small>
+                                    <span id="limitValue" class="fw-bold">50 results</span>
+                                    <small>100</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <div>
+                            <button type="button" class="action-btn" onclick="saveCurrentProfile()">
+                                <i class="fas fa-save me-2"></i> Save as Profile
+                            </button>
+                            <button type="button" class="action-btn" onclick="resetToDefaults()">
+                                <i class="fas fa-undo me-2"></i> Reset Defaults
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" class="action-btn me-2" onclick="toggleAdvancedPanel()">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </button>
+                            <button type="button" class="action-btn bg-accent" onclick="applyAdvancedOptions()">
+                                <i class="fas fa-check me-2"></i> Apply Options
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="dashboard-grid" id="dashboard">
+            <div class="dashboard-card">
+                <h6><i class="fas fa-database me-2"></i> TOTAL RESULTS</h6>
+                <div class="value" id="totalResults">0</div>
+                <div class="trend positive" id="resultsTrend">
+                    <i class="fas fa-arrow-up"></i> 0%
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h6><i class="fas fa-sitemap me-2"></i> CATEGORIES</h6>
+                <div class="value" id="uniqueCategories">0</div>
+                <div class="trend positive" id="categoriesTrend">
+                    <i class="fas fa-arrow-up"></i> 0%
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h6><i class="fas fa-shield-alt me-2"></i> CONFIDENCE</h6>
+                <div class="value" id="confidenceScore">0%</div>
+                <div class="trend positive" id="confidenceTrend">
+                    <i class="fas fa-arrow-up"></i> 0%
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h6><i class="fas fa-exclamation-triangle me-2"></i> HIGH RISK</h6>
+                <div class="value" id="highRiskCount">0</div>
+                <div class="trend negative" id="riskTrend">
+                    <i class="fas fa-arrow-up"></i> 0%
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h6><i class="fas fa-chart-line me-2"></i> RELEVANCE</h6>
+                <div class="value" id="avgRelevance">0%</div>
+                <div class="trend positive" id="relevanceTrend">
+                    <i class="fas fa-arrow-up"></i> 0%
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h6><i class="fas fa-clock me-2"></i> SEARCH TIME</h6>
+                <div class="value" id="searchTime">0s</div>
+                <div class="trend negative" id="timeTrend">
+                    <i class="fas fa-arrow-down"></i> 0%
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toolbar -->
+        <div class="main-toolbar">
+            <div class="filter-section">
+                <label for="typeFilter" class="mb-0 me-2">Filter by:</label>
+                <select id="typeFilter" class="form-select">
+                    <option value="">All Categories</option>
+                </select>
+                
+                <select id="riskFilter" class="form-select" style="max-width: 150px;">
+                    <option value="">All Risks</option>
+                    <option value="High">High Risk</option>
+                    <option value="Medium">Medium Risk</option>
+                    <option value="Low">Low Risk</option>
+                </select>
+                
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="sortByRelevance" checked>
+                    <label class="form-check-label" for="sortByRelevance">Sort by Relevance</label>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="action-btn" onclick="exportData('json')">
+                    <i class="fas fa-file-code"></i> JSON
+                </button>
+                <button class="action-btn" onclick="exportData('csv')">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button class="action-btn" onclick="toggleAnalytics()">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </button>
+                <button class="action-btn" onclick="showReport()">
+                    <i class="fas fa-file-alt"></i> Report
+                </button>
+                <button class="action-btn" onclick="showIntelligencePanel()">
+                    <i class="fas fa-shield-alt"></i> Intel
+                </button>
+            </div>
+            
+            <div id="stats" class="small">
+                <i class="fas fa-info-circle me-2"></i>
+                <span>Ready for OSINT analysis</span>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="row g-4">
+            <!-- Results Panel -->
+            <div class="col-xl-5">
+                <div class="results-panel">
+                    <div class="panel-header">
+                        <h5><i class="fas fa-search-result me-2"></i> OSINT Results</h5>
+                        <div class="view-controls">
+                            <button class="view-btn active" onclick="changeView('list')">
+                                <i class="fas fa-list"></i> List
+                            </button>
+                            <button class="view-btn" onclick="changeView('grid')">
+                                <i class="fas fa-th-large"></i> Grid
+                            </button>
+                            <button class="view-btn" onclick="toggleSort()">
+                                <i class="fas fa-sort-amount-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="results" class="list-view"></div>
+                </div>
+            </div>
+            
+            <!-- Network Visualization -->
+            <div class="col-xl-7">
+                <div id="resultMap">
+                    <div class="network-controls">
+                        <button class="network-btn" onclick="zoomIn()">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="network-btn" onclick="zoomOut()">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="network-btn" onclick="resetView()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="network-btn" onclick="togglePhysics()">
+                            <i class="fas fa-atom"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics Panel -->
+        <div class="analytics-panel" id="analyticsPanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5><i class="fas fa-chart-line me-2"></i> OSINT Analytics</h5>
+                <div class="btn-group">
+                    <button class="action-btn btn-sm active" onclick="updateChart('categories')">Categories</button>
+                    <button class="action-btn btn-sm" onclick="updateChart('risks')">Risks</button>
+                    <button class="action-btn btn-sm" onclick="updateChart('confidence')">Confidence</button>
+                    <button class="action-btn btn-sm" onclick="updateChart('sources')">Sources</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="analyticsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Intelligence Panel -->
+        <div class="intelligence-panel" id="intelligencePanel">
+            <h5><i class="fas fa-shield-alt me-2"></i> Intelligence Assessment</h5>
+            <p class="text-muted mb-4">Comprehensive threat and risk analysis</p>
+            
+            <div class="intelligence-metrics">
+                <div class="metric-card">
+                    <h6>Overall Threat Level</h6>
+                    <div class="value" id="overallThreat">LOW</div>
+                    <small class="text-muted">Based on risk analysis</small>
+                </div>
+                <div class="metric-card">
+                    <h6>Data Reliability</h6>
+                    <div class="value" id="dataReliability">0%</div>
+                    <small class="text-muted">Confidence score average</small>
+                </div>
+                <div class="metric-card">
+                    <h6>Source Diversity</h6>
+                    <div class="value" id="sourceDiversity">0</div>
+                    <small class="text-muted">Unique information sources</small>
+                </div>
+                <div class="metric-card">
+                    <h6>Information Freshness</h6>
+                    <div class="value" id="infoFreshness">0%</div>
+                    <small class="text-muted">Recent vs historical data</small>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button class="action-btn" onclick="generateFullReport()">
+                    <i class="fas fa-download me-2"></i> Download Full Report
+                </button>
+                <button class="action-btn ms-3" onclick="analyzeWithAI()">
+                    <i class="fas fa-robot me-2"></i> AI Analysis
+                </button>
+            </div>
+        </div>
+        
+        <!-- Report Panel -->
+        <div class="report-panel" id="reportPanel">
+            <h5><i class="fas fa-file-alt me-2"></i> Intelligence Report</h5>
+            <p class="text-muted mb-4">Comprehensive analysis of collected OSINT data</p>
+            
+            <div class="mb-4">
+                <h6>Executive Summary</h6>
+                <div id="executiveSummary" class="p-3 bg-secondary rounded">
+                    No report generated yet.
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Key Findings</h6>
+                    <ul id="keyFindings" class="list-unstyled">
+                        <li>No findings available</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Recommendations</h6>
+                    <ul id="recommendations" class="list-unstyled">
+                        <li>No recommendations available</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button class="action-btn" onclick="exportReport()">
+                    <i class="fas fa-download me-2"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <div class="ai-toggle" onclick="toggleAIPanel()">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="ai-panel" id="aiPanel">
+            <div class="panel-header">
+                <h5><i class="fas fa-robot me-2"></i> OSINT AI Assistant</h5>
+                <button class="view-btn" onclick="toggleAIPanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="mb-3">
+                    <label class="form-label">Ask AI about the data:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="aiQuery" placeholder="What patterns do you see...">
+                        <button class="btn btn-accent" onclick="askAI()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="ai-response" id="aiResponse" style="height: 300px; overflow-y: auto; background: var(--bg-secondary); border-radius: 10px; padding: 15px;">
+                    <div class="text-center text-muted p-4">
+                        <i class="fas fa-robot fa-2x mb-3"></i>
+                        <p>Hello! I can help you analyze OSINT data, find patterns, and generate insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip-custom"></div>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <script>
+        // Initialize application
+        let allData = [];
+        let currentAnalytics = {};
+        let currentReport = {};
+        let network = null;
+        let analyticsChart = null;
+        let currentView = 'list';
+        let currentSort = 'relevance';
+        let searchConfig = {
+            pages: 2,
+            searchEngine: 'duckduckgo',
+            privacy: 'enhanced',
+            limit: 50,
+            enableAnalytics: true,
+            enableRiskAssessment: true,
+            enableConfidenceScoring: true,
+            enableRelevanceScoring: true,
+            aiAutoCategorize: true,
+            aiPatternRecognition: true,
+            aiThreatDetection: false,
+            aiAnalysisLevel: 2
+        };
+        
+        // Initialize Toastr
+        toastr.options = {
+            positionClass: "toast-top-right",
+            progressBar: true,
+            timeOut: 4000,
+            closeButton: true,
+            newestOnTop: true
+        };
+        
+        // DOM Elements
+        const tooltip = document.getElementById("tooltip");
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        const loadingText = document.getElementById("loadingText");
+        const loadingSubtext = document.getElementById("loadingSubtext");
+        const loadingProgress = document.getElementById("loadingProgress");
+        
+        // Main search function
+        document.getElementById("searchForm").onsubmit = async e => {
+            e.preventDefault();
+            
+            const query = document.getElementById("queryInput").value.trim();
+            if (!query) {
+                toastr.warning('Please enter a search query');
+                return;
+            }
+            
+            // Show loading overlay
+            showLoading('Initializing OSINT search...', 10);
+            
+            try {
+                // Prepare form data
+                const formData = new FormData();
+                formData.append("query", query);
+                formData.append("pages", searchConfig.pages);
+                formData.append("search_engine", searchConfig.searchEngine);
+                
+                // Make API call
+                const response = await fetch("/search", { 
+                    method: "POST", 
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Search failed');
+                }
+                
+                // Complete loading
+                simulateProgress(100, 'Search complete!');
+                await sleep(300);
+                
+                // Store data
+                allData = result.data || [];
+                currentAnalytics = result.analytics || {};
+                
+                // Update UI
+                updateDashboard(allData, currentAnalytics);
+                buildFilter();
+                renderStats(allData);
+                renderResults(allData);
+                renderGraph(allData, query);
+                
+                // Fetch intelligence report
+                await fetchIntelligenceReport(query);
+                
+                // Show success
+                toastr.success(`Found ${allData.length} intelligence items`, 'Search Complete');
+                
+            } catch (error) {
+                console.error("Search error:", error);
+                toastr.error(`Search failed: ${error.message}`, 'Error');
+            } finally {
+                hideLoading();
+            }
+        };
+        
+        // Simulate progress
+        function simulateProgress(percent, message) {
+            loadingProgress.style.width = percent + '%';
+            loadingText.textContent = message;
+            loadingSubtext.textContent = `${percent}% complete`;
+        }
+        
+        // Sleep utility
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Show loading overlay
+        function showLoading(message, progress = 0) {
+            loadingText.textContent = message;
+            loadingProgress.style.width = progress + '%';
+            loadingOverlay.classList.add('active');
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+            setTimeout(() => {
+                loadingProgress.style.width = '0%';
+            }, 300);
+        }
+        
+        // Update dashboard
+        function updateDashboard(data, analytics) {
+            if (!data.length) {
+                document.querySelectorAll('.dashboard-card .value').forEach(el => el.textContent = '0');
+                return;
+            }
+            
+            // Total results
+            document.getElementById('totalResults').textContent = data.length;
+            
+            // Unique categories
+            const uniqueCategories = [...new Set(data.map(item => item.type))].length;
+            document.getElementById('uniqueCategories').textContent = uniqueCategories;
+            
+            // Average confidence
+            const avgConfidence = Math.round(data.reduce((sum, item) => sum + item.confidence, 0) / data.length);
+            document.getElementById('confidenceScore').textContent = `${avgConfidence}%`;
+            
+            // High risk count
+            const highRiskCount = data.filter(item => item.risk_level === 'High').length;
+            document.getElementById('highRiskCount').textContent = highRiskCount;
+            
+            // Average relevance
+            const avgRelevance = Math.round(data.reduce((sum, item) => sum + item.relevance, 0) / data.length);
+            document.getElementById('avgRelevance').textContent = `${avgRelevance}%`;
+            
+            // Update trends
+            updateTrends(analytics);
+        }
+        
+        // Update trends
+        function updateTrends(analytics) {
+            // Simulated trend data
+            const trends = {
+                resultsTrend: 12,
+                categoriesTrend: 8,
+                confidenceTrend: 3,
+                riskTrend: -15,
+                relevanceTrend: 5,
+                timeTrend: -7
+            };
+            
+            Object.keys(trends).forEach(trendId => {
+                const trendEl = document.getElementById(trendId);
+                const value = trends[trendId];
+                const isPositive = value >= 0;
+                
+                trendEl.className = `trend ${isPositive ? 'positive' : 'negative'}`;
+                trendEl.innerHTML = `<i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i> ${Math.abs(value)}%`;
+            });
+        }
+        
+        // Build filter dropdown
+        function buildFilter() {
+            const typeFilter = document.getElementById("typeFilter");
+            typeFilter.innerHTML = '<option value="">All Categories</option>';
+            
+            if (!allData.length) return;
+            
+            // Group by type
+            const typeCounts = {};
+            allData.forEach(item => {
+                typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
+            });
+            
+            // Sort by count
+            const sortedTypes = Object.entries(typeCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => ({ type, count }));
+            
+            // Add options
+            sortedTypes.forEach(({ type, count }) => {
+                const option = document.createElement("option");
+                option.value = type;
+                option.textContent = `${type} (${count})`;
+                typeFilter.appendChild(option);
+            });
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const typeFilterValue = document.getElementById("typeFilter").value;
+            const riskFilterValue = document.getElementById("riskFilter").value;
+            const sortByRelevance = document.getElementById("sortByRelevance").checked;
+            
+            let filteredData = allData;
+            
+            // Apply type filter
+            if (typeFilterValue) {
+                filteredData = filteredData.filter(x => x.type === typeFilterValue);
+            }
+            
+            // Apply risk filter
+            if (riskFilterValue) {
+                filteredData = filteredData.filter(x => x.risk_level === riskFilterValue);
+            }
+            
+            // Apply sorting
+            if (sortByRelevance) {
+                filteredData = filteredData.sort((a, b) => b.relevance - a.relevance);
+            } else {
+                filteredData = filteredData.sort((a, b) => b.confidence - a.confidence);
+            }
+            
+            renderResults(filteredData);
+            renderGraph(filteredData, document.getElementById("queryInput").value);
+            renderStats(filteredData);
+        }
+        
+        // Render statistics
+        function renderStats(data) {
+            const stats = document.getElementById("stats");
+            
+            if (!data.length) {
+                stats.innerHTML = '<i class="fas fa-info-circle me-2"></i> No results found';
+                return;
+            }
+            
+            const counts = {};
+            data.forEach(x => {
+                counts[x.type] = (counts[x.type] || 0) + 1;
+            });
+            
+            const typesCount = Object.keys(counts).length;
+            const totalResults = data.length;
+            const avgConfidence = Math.round(data.reduce((sum, x) => sum + x.confidence, 0) / data.length);
+            
+            stats.innerHTML = `
+                <i class="fas fa-chart-bar me-2"></i>
+                <strong>${totalResults}</strong> results | 
+                <strong>${typesCount}</strong> types | 
+                <strong>${avgConfidence}%</strong> avg confidence
+            `;
+        }
+        
+        // Render results
+        function renderResults(data) {
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+            
+            if (!data.length) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h5>No Intelligence Data Found</h5>
+                        <p>Try adjusting your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            data.forEach((result, index) => {
+                const card = createResultCard(result, index);
+                resultsContainer.appendChild(card);
+            });
+        }
+        
+        // Create result card
+        function createResultCard(result, index) {
+            const card = document.createElement("div");
+            card.className = "result-card";
+            
+            // Set border color based on risk level
+            let borderColor;
+            switch(result.risk_level) {
+                case 'High': borderColor = 'var(--danger)'; break;
+                case 'Medium': borderColor = 'var(--warning)'; break;
+                default: borderColor = 'var(--success)';
+            }
+            card.style.borderLeftColor = borderColor;
+            
+            // Determine risk indicator color
+            let riskColor;
+            switch(result.risk_level) {
+                case 'High': riskColor = 'danger'; break;
+                case 'Medium': riskColor = 'warning'; break;
+                default: riskColor = 'success';
+            }
+            
+            // Format date
+            const date = result.timestamp ? new Date(result.timestamp) : new Date();
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            card.innerHTML = `
+                <div class="result-card-header">
+                    <div class="result-avatar">
+                        <i class="fas fa-link" style="font-size: 32px; margin: 19px;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="result-title">${result.title}</div>
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <span class="badge-type">${result.type}</span>
+                            <span class="badge bg-${riskColor}">${result.risk_level} Risk</span>
+                            <span class="badge bg-dark">${result.confidence}% Confident</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-card-body">
+                    ${result.snippet ? `<div class="result-snippet">${result.snippet}</div>` : ''}
+                    <div class="result-link">
+                        <i class="fas fa-link me-2"></i>${result.link}
+                    </div>
+                    <div class="result-meta mt-3">
+                        <span><i class="fas fa-calendar me-1"></i> ${formattedDate}</span>
+                        <span><i class="fas fa-chart-line me-1"></i> ${result.relevance}% Relevant</span>
+                        <span><i class="fas fa-search me-1"></i> ${result.search_engine || 'duckduckgo'}</span>
+                    </div>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="me-3">
+                            <small class="text-muted">Confidence:</small>
+                            <div class="confidence-meter" style="width: 100px;">
+                                <div class="confidence-fill" style="width: ${result.confidence}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <small class="text-muted">Relevance:</small>
+                            <div class="confidence-meter" style="width: 100px;">
+                                <div class="confidence-fill" style="width: ${result.relevance}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-actions">
+                        <a href="${result.link}" target="_blank" class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-external-link-alt me-1"></i> Visit
+                        </a>
+                        <button class="btn btn-sm btn-outline-info" onclick="analyzeItem('${result.id}')">
+                            <i class="fas fa-chart-line me-1"></i> Analyze
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="saveItem('${result.id}')">
+                            <i class="fas fa-star me-1"></i> Save
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="flagItem('${result.id}')">
+                            <i class="fas fa-flag me-1"></i> Flag
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Render network graph
+        function renderGraph(data, query) {
+            const container = document.getElementById("resultMap");
+            container.innerHTML = "";
+            
+            if (!data.length) {
+                container.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <i class="fas fa-project-diagram fa-3x mb-3"></i>
+                        <h5>No Data for Visualization</h5>
+                        <p>Search for data to generate network</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let nodes = [], edges = [], nodeId = 1;
+            
+            // Central query node
+            nodes.push({
+                id: nodeId,
+                label: query || "Query",
+                shape: "box",
+                color: "#00d4ff",
+                font: { color: "#000", size: 28, face: "Arial Black" },
+                margin: 25,
+                size: 50,
+                borderWidth: 4,
+                borderColor: "#7c4dff",
+                shadow: true,
+                title: `Central Query: ${query}`
+            });
+            
+            const rootId = nodeId++;
+            
+            // Group data by type
+            const groupedByType = {};
+            data.forEach(item => {
+                if (!groupedByType[item.type]) {
+                    groupedByType[item.type] = [];
+                }
+                groupedByType[item.type].push(item);
+            });
+            
+            // Create type nodes
+            const typeNodes = {};
+            Object.entries(groupedByType).forEach(([type, items]) => {
+                const typeNodeId = nodeId++;
+                typeNodes[type] = typeNodeId;
+                
+                nodes.push({
+                    id: typeNodeId,
+                    label: `${type}\n(${items.length})`,
+                    shape: "circle",
+                    color: colorByType(type),
+                    size: 30 + Math.min(items.length * 3, 60),
+                    font: { size: 16, color: "#fff", face: "Arial" },
+                    shadow: true,
+                    title: `${type}\n${items.length} items`
+                });
+                
+                // Connect to root
+                edges.push({
+                    from: rootId,
+                    to: typeNodeId,
+                    color: { color: colorByType(type), opacity: 0.9 },
+                    width: 4,
+                    arrows: 'to',
+                    smooth: { type: 'curvedCW', roundness: 0.3 }
+                });
+            });
+            
+            // Create item nodes
+            data.forEach((item, index) => {
+                const itemNodeId = nodeId++;
+                
+                // Determine node color based on risk level
+                let nodeColor;
+                switch(item.risk_level) {
+                    case 'High': nodeColor = '#ff4081'; break;
+                    case 'Medium': nodeColor = '#ff9100'; break;
+                    default: nodeColor = '#00e676';
+                }
+                
+                nodes.push({
+                    id: itemNodeId,
+                    label: item.title.length > 20 ? item.title.substring(0, 20) + '...' : item.title,
+                    shape: "dot",
+                    color: nodeColor,
+                    size: 20 + (item.confidence / 10),
+                    title: `${item.title}\nType: ${item.type}\nRisk: ${item.risk_level}\nConfidence: ${item.confidence}%\nRelevance: ${item.relevance}%`,
+                    font: { size: 12, color: "#fff" },
+                    borderWidth: 2,
+                    borderColor: "#fff"
+                });
+                
+                // Connect to type node
+                if (typeNodes[item.type]) {
+                    edges.push({
+                        from: typeNodes[item.type],
+                        to: itemNodeId,
+                        color: { color: colorByType(item.type), opacity: 0.7 },
+                        width: 2,
+                        smooth: { type: 'continuous' }
+                    });
+                }
+            });
+            
+            // Create the network
+            network = new vis.Network(
+                container,
+                { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) },
+                {
+                    interaction: { 
+                        hover: true,
+                        tooltipDelay: 100,
+                        zoomView: true,
+                        dragView: true
+                    },
+                    physics: {
+                        enabled: true,
+                        solver: 'forceAtlas2Based',
+                        forceAtlas2Based: {
+                            gravitationalConstant: -150,
+                            centralGravity: 0.005,
+                            springLength: 200,
+                            springConstant: 0.05,
+                            damping: 0.4,
+                            avoidOverlap: 1
+                        },
+                        stabilization: {
+                            enabled: true,
+                            iterations: 2000,
+                            updateInterval: 100,
+                            onlyDynamicEdges: false,
+                            fit: true
+                        }
+                    },
+                    layout: {
+                        improvedLayout: true,
+                        hierarchical: {
+                            enabled: false,
+                            direction: 'LR',
+                            sortMethod: 'hubsize'
+                        }
+                    },
+                    nodes: {
+                        shapeProperties: {
+                            useBorderWithImage: false,
+                            interpolation: false
+                        },
+                        scaling: {
+                            min: 10,
+                            max: 50,
+                            label: {
+                                enabled: true,
+                                min: 8,
+                                max: 30
+                            }
+                        }
+                    },
+                    edges: {
+                        smooth: {
+                            type: 'dynamic',
+                            roundness: 0.5
+                        },
+                        scaling: {
+                            min: 1,
+                            max: 10
+                        }
+                    }
+                }
+            );
+            
+            // Network event handlers
+            network.on("hoverNode", params => {
+                const node = network.body.data.nodes.get(params.node);
+                if (node && node.title) {
+                    tooltip.innerHTML = `
+                        <div class="fw-bold mb-2">${node.label}</div>
+                        <div>${node.title.replace(/\n/g, '<br>')}</div>
+                    `;
+                    tooltip.style.display = "block";
+                    tooltip.style.left = params.event.pageX + 20 + "px";
+                    tooltip.style.top = params.event.pageY + 20 + "px";
+                }
+            });
+            
+            network.on("blurNode", () => {
+                tooltip.style.display = "none";
+            });
+            
+            network.on("click", params => {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = network.body.data.nodes.get(nodeId);
+                    
+                    if (node && node.title && node.title.includes('Type:')) {
+                        const typeMatch = node.title.match(/Type: (\w+)/);
+                        if (typeMatch) {
+                            document.getElementById("typeFilter").value = typeMatch[1];
+                            applyFilters();
+                        }
+                    }
+                }
+            });
+            
+            // Auto-fit to view
+            setTimeout(() => {
+                network.fit({ 
+                    animation: { 
+                        duration: 1500, 
+                        easingFunction: 'easeInOutQuint' 
+                    } 
+                });
+            }, 1000);
+        }
+        
+        // Color by type
+        function colorByType(type) {
+            if (!type) return "#666";
+            
+            let hash = 0;
+            for (let i = 0; i < type.length; i++) {
+                hash = type.charCodeAt(i) + ((hash << 8) - hash);
+            }
+            
+            const hue = Math.abs(hash % 360);
+            return `hsl(${hue}, 90%, 65%)`;
+        }
+        
+        // Advanced options
+        function toggleAdvancedPanel() {
+            const panel = document.getElementById('advancedPanel');
+            const toggleBtn = document.querySelector('.toggle-advanced');
+            panel.classList.toggle('active');
+            
+            if (panel.classList.contains('active')) {
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Advanced Options';
+            } else {
+                toggleBtn.innerHTML = '<i class="fas fa-sliders-h"></i> Advanced Search Options';
+            }
+        }
+        
+        function applyAdvancedOptions() {
+            // Update search config
+            searchConfig.pages = parseInt(document.getElementById('searchPages').value);
+            searchConfig.searchEngine = document.getElementById('searchEngine').value;
+            searchConfig.privacy = document.getElementById('privacyLevel').value;
+            searchConfig.limit = parseInt(document.getElementById('resultLimit').value);
+            searchConfig.enableAnalytics = document.getElementById('enableAnalytics').checked;
+            searchConfig.enableRiskAssessment = document.getElementById('enableRiskAssessment').checked;
+            searchConfig.enableConfidenceScoring = document.getElementById('enableConfidenceScoring').checked;
+            searchConfig.enableRelevanceScoring = document.getElementById('enableRelevanceScoring').checked;
+            searchConfig.aiAutoCategorize = document.getElementById('aiAutoCategorize').checked;
+            searchConfig.aiPatternRecognition = document.getElementById('aiPatternRecognition').checked;
+            searchConfig.aiThreatDetection = document.getElementById('aiThreatDetection').checked;
+            searchConfig.aiAnalysisLevel = parseInt(document.getElementById('aiAnalysisLevel').value);
+            
+            // Update UI values
+            document.getElementById('pagesValue').textContent = `${searchConfig.pages} Pages`;
+            document.getElementById('limitValue').textContent = `${searchConfig.limit} results`;
+            
+            // Update AI level text
+            const aiLevels = {1: 'Basic', 2: 'Standard', 3: 'Advanced'};
+            document.getElementById('aiLevelValue').textContent = aiLevels[searchConfig.aiAnalysisLevel];
+            
+            // Update active filters count
+            updateActiveFiltersCount();
+            
+            toastr.success('Advanced options applied successfully');
+            toggleAdvancedPanel();
+        }
+        
+        function updateActiveFiltersCount() {
+            let count = 0;
+            
+            // Count checked options
+            const checkboxes = [
+                'enableAnalytics', 'enableRiskAssessment', 'enableConfidenceScoring',
+                'enableRelevanceScoring', 'aiAutoCategorize', 'aiPatternRecognition',
+                'aiThreatDetection'
+            ];
+            
+            checkboxes.forEach(id => {
+                if (document.getElementById(id).checked) count++;
+            });
+            
+            document.getElementById('activeFilters').textContent = count;
+        }
+        
+        function resetToDefaults() {
+            // Reset to default values
+            document.getElementById('searchPages').value = 2;
+            document.getElementById('searchEngine').value = 'duckduckgo';
+            document.getElementById('privacyLevel').value = 'enhanced';
+            document.getElementById('resultLimit').value = 50;
+            document.getElementById('enableAnalytics').checked = true;
+            document.getElementById('enableRiskAssessment').checked = true;
+            document.getElementById('enableConfidenceScoring').checked = true;
+            document.getElementById('enableRelevanceScoring').checked = true;
+            document.getElementById('aiAutoCategorize').checked = true;
+            document.getElementById('aiPatternRecognition').checked = true;
+            document.getElementById('aiThreatDetection').checked = false;
+            document.getElementById('aiAnalysisLevel').value = 2;
+            
+            // Update UI
+            document.getElementById('pagesValue').textContent = '2 Pages';
+            document.getElementById('limitValue').textContent = '50 results';
+            document.getElementById('aiLevelValue').textContent = 'Standard';
+            
+            toastr.success('Reset to default settings');
+        }
+        
+        // View controls
+        function changeView(view) {
+            currentView = view;
+            const results = document.getElementById('results');
+            const [listBtn, gridBtn] = document.querySelectorAll('.view-controls .view-btn');
+            
+            results.className = `${view}-view`;
+            
+            listBtn.classList.toggle('active', view === 'list');
+            gridBtn.classList.toggle('active', view === 'grid');
+            
+            applyFilters();
+        }
+        
+        function toggleSort() {
+            const sortBtn = document.querySelector('.view-controls .view-btn:nth-child(3)');
+            const sortCheckbox = document.getElementById('sortByRelevance');
+            
+            if (sortCheckbox.checked) {
+                sortCheckbox.checked = false;
+                sortBtn.innerHTML = '<i class="fas fa-sort-amount-down"></i> Confidence';
+                toastr.info('Sorting by Confidence');
+            } else {
+                sortCheckbox.checked = true;
+                sortBtn.innerHTML = '<i class="fas fa-sort-amount-down"></i> Relevance';
+                toastr.info('Sorting by Relevance');
+            }
+            
+            applyFilters();
+        }
+        
+        // Analytics panel
+        function toggleAnalytics() {
+            const panel = document.getElementById('analyticsPanel');
+            panel.classList.toggle('active');
+            
+            if (panel.classList.contains('active') && !analyticsChart) {
+                initializeAnalyticsChart('categories');
+            }
+        }
+        
+        function initializeAnalyticsChart(type) {
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            
+            let labels, data, colors;
+            
+            if (type === 'categories' && currentAnalytics.categories) {
+                labels = Object.keys(currentAnalytics.categories);
+                data = Object.values(currentAnalytics.categories);
+                colors = labels.map(label => colorByType(label));
+            } else if (type === 'risks' && currentAnalytics.risk_distribution) {
+                labels = Object.keys(currentAnalytics.risk_distribution);
+                data = Object.values(currentAnalytics.risk_distribution);
+                colors = ['#ff4081', '#ff9100', '#00e676'];
+            } else if (type === 'confidence' && currentAnalytics.confidence_stats) {
+                labels = ['Average', 'Min', 'Max'];
+                data = [
+                    currentAnalytics.confidence_stats.average,
+                    currentAnalytics.confidence_stats.min,
+                    currentAnalytics.confidence_stats.max
+                ];
+                colors = ['#00d4ff', '#7c4dff', '#2979ff'];
+            } else {
+                // Fallback to categories
+                if (!currentAnalytics.categories) {
+                    const categories = {};
+                    allData.forEach(item => {
+                        categories[item.type] = (categories[item.type] || 0) + 1;
+                    });
+                    labels = Object.keys(categories);
+                    data = Object.values(categories);
+                } else {
+                    labels = Object.keys(currentAnalytics.categories);
+                    data = Object.values(currentAnalytics.categories);
+                }
+                colors = labels.map(label => colorByType(label));
+            }
+            
+            analyticsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: type === 'categories' ? 'Results by Category' : 
+                               type === 'risks' ? 'Risk Distribution' : 'Confidence Scores',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#b0b8d0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#b0b8d0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChart(type) {
+            if (!analyticsChart) return;
+            
+            // Update button states
+            document.querySelectorAll('.analytics-panel .action-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-accent');
+            });
+            event.target.classList.add('active', 'bg-accent');
+            
+            // Destroy old chart and create new one
+            analyticsChart.destroy();
+            initializeAnalyticsChart(type);
+        }
+        
+        // Intelligence panel
+        function showIntelligencePanel() {
+            const panel = document.getElementById('intelligencePanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            
+            if (panel.style.display === 'block') {
+                updateIntelligenceMetrics();
+            }
+        }
+        
+        function updateIntelligenceMetrics() {
+            if (!allData.length) return;
+            
+            // Calculate metrics
+            const highRiskCount = allData.filter(item => item.risk_level === 'High').length;
+            const overallThreat = highRiskCount > 3 ? 'HIGH' : highRiskCount > 0 ? 'MEDIUM' : 'LOW';
+            const dataReliability = Math.round(allData.reduce((sum, item) => sum + item.confidence, 0) / allData.length);
+            const sourceDiversity = new Set(allData.map(item => item.type)).size;
+            const infoFreshness = 85; // Simulated freshness score
+            
+            // Update UI
+            document.getElementById('overallThreat').textContent = overallThreat;
+            document.getElementById('overallThreat').className = `value text-${overallThreat.toLowerCase()}`;
+            document.getElementById('dataReliability').textContent = `${dataReliability}%`;
+            document.getElementById('sourceDiversity').textContent = sourceDiversity;
+            document.getElementById('infoFreshness').textContent = `${infoFreshness}%`;
+        }
+        
+        // Fetch intelligence report
+        async function fetchIntelligenceReport(query) {
+            try {
+                const response = await fetch(`/report?query=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    currentReport = result.report || {};
+                    updateReportPanel();
+                }
+            } catch (error) {
+                console.error('Error fetching report:', error);
+            }
+        }
+        
+        function showReport() {
+            const panel = document.getElementById('reportPanel');
+            panel.classList.toggle('active');
+        }
+        
+        function updateReportPanel() {
+            if (!currentReport.executive_summary) return;
+            
+            // Executive Summary
+            const summary = currentReport.executive_summary;
+            const summaryHtml = `
+                <p><strong>Status:</strong> ${summary.status}</p>
+                <p><strong>Total Results:</strong> ${summary.total_results}</p>
+                <p><strong>High Risk Items:</strong> ${summary.high_risk_items}</p>
+                <p><strong>Average Confidence:</strong> ${summary.average_confidence}%</p>
+                <p><strong>Unique Categories:</strong> ${summary.unique_categories}</p>
+            `;
+            document.getElementById('executiveSummary').innerHTML = summaryHtml;
+            
+            // Key Findings
+            const findingsList = document.getElementById('keyFindings');
+            findingsList.innerHTML = '';
+            
+            if (currentReport.key_findings && currentReport.key_findings.length > 0) {
+                currentReport.key_findings.forEach(finding => {
+                    const li = document.createElement('li');
+                    li.className = 'mb-2';
+                    li.innerHTML = `<i class="fas fa-search me-2 text-accent"></i>${finding.description}`;
+                    findingsList.appendChild(li);
+                });
+            }
+            
+            // Recommendations
+            const recList = document.getElementById('recommendations');
+            recList.innerHTML = '';
+            
+            if (currentReport.recommendations && currentReport.recommendations.length > 0) {
+                currentReport.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.className = 'mb-2';
+                    li.innerHTML = `<i class="fas fa-lightbulb me-2 text-warning"></i><strong>${rec.priority}:</strong> ${rec.action}`;
+                    recList.appendChild(li);
+                });
+            }
+        }
+        
+        // Export functionality
+        async function exportData(format) {
+            if (!allData.length) {
+                toastr.warning('No data to export');
+                return;
+            }
+            
+            showLoading(`Exporting data as ${format.toUpperCase()}...`, 0);
+            
+            try {
+                const response = await fetch(`/export/${format}`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    // Get filename from response headers
+                    const contentDisposition = response.headers.get('content-disposition');
+                    let filename = `osint-export.${format}`;
+                    
+                    if (contentDisposition) {
+                        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                        if (filenameMatch) {
+                            filename = filenameMatch[1];
+                        }
+                    }
+                    
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    toastr.success(`Data exported as ${format.toUpperCase()}`);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Export failed');
+                }
+            } catch (error) {
+                toastr.error(`Export failed: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function exportReport() {
+            if (!currentReport.executive_summary) {
+                toastr.warning('No report available to export');
+                return;
+            }
+            
+            // Create HTML report
+            const reportHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>OSINT Intelligence Report - ${currentReport.query}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        h1 { color: #333; border-bottom: 2px solid #00d4ff; padding-bottom: 10px; }
+                        .summary { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+                        .section { margin: 30px 0; }
+                        .stat { display: inline-block; margin: 10px 20px 10px 0; }
+                        .stat-value { font-size: 24px; font-weight: bold; color: #00d4ff; }
+                        .stat-label { color: #666; font-size: 14px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>OSINT Intelligence Report</h1>
+                    <p><strong>Query:</strong> ${currentReport.query}</p>
+                    <p><strong>Generated:</strong> ${currentReport.generated_at}</p>
+                    
+                    <div class="summary">
+                        <h3>Executive Summary</h3>
+                        ${Object.entries(currentReport.executive_summary).map(([key, value]) => 
+                            `<p><strong>${key.replace(/_/g, ' ').toUpperCase()}:</strong> ${value}</p>`
+                        ).join('')}
+                    </div>
+                    
+                    ${currentReport.key_findings ? `
+                        <div class="section">
+                            <h3>Key Findings</h3>
+                            <ul>
+                                ${currentReport.key_findings.map(f => `<li>${f.description}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${currentReport.recommendations ? `
+                        <div class="section">
+                            <h3>Recommendations</h3>
+                            <ul>
+                                ${currentReport.recommendations.map(r => 
+                                    `<li><strong>${r.priority}:</strong> ${r.action}</li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${currentReport.statistics ? `
+                        <div class="section">
+                            <h3>Statistics</h3>
+                            ${Object.entries(currentReport.statistics).map(([key, value]) => {
+                                if (typeof value === 'object') {
+                                    return `
+                                        <h4>${key.replace(/_/g, ' ').toUpperCase()}</h4>
+                                        <ul>
+                                            ${Object.entries(value).map(([k, v]) => 
+                                                `<li><strong>${k}:</strong> ${v}</li>`
+                                            ).join('')}
+                                        </ul>
+                                    `;
+                                } else {
+                                    return `<p><strong>${key.replace(/_/g, ' ').toUpperCase()}:</strong> ${value}</p>`;
+                                }
+                            }).join('')}
+                        </div>
+                    ` : ''}
+                </body>
+                </html>
+            `;
+            
+            // Download the report
+            const blob = new Blob([reportHtml], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `osint-report-${currentReport.query}-${Date.now()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            toastr.success('Report exported successfully');
+        }
+        
+        function generateFullReport() {
+            exportReport();
+        }
+        
+        // Profile management
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+            loadProfiles();
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+        
+        async function loadProfiles() {
+            try {
+                const response = await fetch('/profile/list');
+                if (response.ok) {
+                    const result = await response.json();
+                    displayProfiles(result.profiles || []);
+                }
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+            }
+        }
+        
+        function displayProfiles(profiles) {
+            const profileList = document.getElementById('profileList');
+            
+            if (!profiles.length) {
+                profileList.innerHTML = '<p class="text-muted text-center">No profiles saved yet.</p>';
+                return;
+            }
+            
+            profileList.innerHTML = profiles.map(profile => `
+                <div class="card mb-3 bg-secondary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${profile.name || 'Unnamed Profile'}</h6>
+                                <small class="text-muted">Created: ${new Date(profile.created_at).toLocaleDateString()}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-light me-2" onclick="loadProfile('${profile.id}')">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProfile('${profile.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function saveCurrentProfile() {
+            const profileName = prompt('Enter profile name:');
+            if (!profileName) return;
+            
+            const profile = {
+                name: profileName,
+                config: searchConfig,
+                query: document.getElementById('queryInput').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch('/profile/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profile)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    toastr.success(`Profile "${profileName}" saved`);
+                    loadProfiles();
+                } else {
+                    throw new Error('Failed to save profile');
+                }
+            } catch (error) {
+                toastr.error(`Error saving profile: ${error.message}`);
+            }
+        }
+        
+        async function loadProfile(profileId) {
+            try {
+                const response = await fetch(`/profile/load/${profileId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const profile = result.profile;
+                    
+                    // Apply profile settings
+                    if (profile.config) {
+                        Object.assign(searchConfig, profile.config);
+                        applyProfileToUI();
+                    }
+                    
+                    if (profile.query) {
+                        document.getElementById('queryInput').value = profile.query;
+                    }
+                    
+                    closeProfileModal();
+                    toastr.success(`Profile "${profile.name}" loaded`);
+                }
+            } catch (error) {
+                toastr.error(`Error loading profile: ${error.message}`);
+            }
+        }
+        
+        function applyProfileToUI() {
+            // Apply search config to UI
+            document.getElementById('searchPages').value = searchConfig.pages;
+            document.getElementById('searchEngine').value = searchConfig.searchEngine;
+            document.getElementById('privacyLevel').value = searchConfig.privacy;
+            document.getElementById('resultLimit').value = searchConfig.limit;
+            document.getElementById('enableAnalytics').checked = searchConfig.enableAnalytics;
+            document.getElementById('enableRiskAssessment').checked = searchConfig.enableRiskAssessment;
+            document.getElementById('enableConfidenceScoring').checked = searchConfig.enableConfidenceScoring;
+            document.getElementById('enableRelevanceScoring').checked = searchConfig.enableRelevanceScoring;
+            document.getElementById('aiAutoCategorize').checked = searchConfig.aiAutoCategorize;
+            document.getElementById('aiPatternRecognition').checked = searchConfig.aiPatternRecognition;
+            document.getElementById('aiThreatDetection').checked = searchConfig.aiThreatDetection;
+            document.getElementById('aiAnalysisLevel').value = searchConfig.aiAnalysisLevel;
+            
+            // Update UI values
+            document.getElementById('pagesValue').textContent = `${searchConfig.pages} Pages`;
+            document.getElementById('limitValue').textContent = `${searchConfig.limit} results`;
+            
+            // Update AI level text
+            const aiLevels = {1: 'Basic', 2: 'Standard', 3: 'Advanced'};
+            document.getElementById('aiLevelValue').textContent = aiLevels[searchConfig.aiAnalysisLevel];
+        }
+        
+        async function deleteProfile(profileId) {
+            if (confirm('Are you sure you want to delete this profile?')) {
+                // Note: In production, you would call a DELETE endpoint
+                toastr.info('Profile deletion would be implemented with a backend endpoint');
+            }
+        }
+        
+        function createNewProfile() {
+            saveCurrentProfile();
+        }
+        
+        // AI Assistant
+        function toggleAIPanel() {
+            const panel = document.getElementById('aiPanel');
+            panel.classList.toggle('active');
+        }
+        
+        async function askAI() {
+            const query = document.getElementById('aiQuery').value.trim();
+            if (!query) {
+                toastr.warning('Please enter a question for the AI');
+                return;
+            }
+            
+            const responseArea = document.getElementById('aiResponse');
+            responseArea.innerHTML = `
+                <div class="text-end mb-3">
+                    <div class="badge bg-accent p-2">You: ${query}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="badge bg-secondary p-2">AI: Analyzing your question...</div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/ai/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const analysis = result.analysis;
+                    
+                    responseArea.innerHTML += `
+                        <div class="mb-3">
+                            <div class="badge bg-secondary p-2">AI: ${analysis.analysis}</div>
+                        </div>
+                        ${analysis.patterns && analysis.patterns.length ? `
+                            <div class="mt-3">
+                                <strong>Patterns:</strong>
+                                <ul class="mt-2">
+                                    ${analysis.patterns.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${analysis.insights && analysis.insights.length ? `
+                            <div class="mt-3">
+                                <strong>Insights:</strong>
+                                <ul class="mt-2">
+                                    ${analysis.insights.map(i => `<li>${i}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${analysis.recommendations && analysis.recommendations.length ? `
+                            <div class="mt-3">
+                                <strong>Recommendations:</strong>
+                                <ul class="mt-2">
+                                    ${analysis.recommendations.map(r => `<li>${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+                } else {
+                    throw new Error('AI analysis failed');
+                }
+            } catch (error) {
+                responseArea.innerHTML += `
+                    <div class="mb-3">
+                        <div class="badge bg-danger p-2">AI: Sorry, I encountered an error. Please try again.</div>
+                    </div>
+                `;
+            }
+            
+            responseArea.scrollTop = responseArea.scrollHeight;
+            document.getElementById('aiQuery').value = '';
+        }
+        
+        function analyzeWithAI() {
+            const aiQuery = `Analyze the current OSINT data for ${document.getElementById('queryInput').value}`;
+            document.getElementById('aiQuery').value = aiQuery;
+            askAI();
+        }
+        
+        // Network controls
+        function zoomIn() {
+            if (network) {
+                network.moveTo({ scale: network.getScale() * 1.5 });
+            }
+        }
+        
+        function zoomOut() {
+            if (network) {
+                network.moveTo({ scale: network.getScale() * 0.75 });
+            }
+        }
+        
+        function resetView() {
+            if (network) {
+                network.fit({ animation: { duration: 1000 } });
+            }
+        }
+        
+        function togglePhysics() {
+            if (network) {
+                const options = network.getOptions();
+                options.physics.enabled = !options.physics.enabled;
+                network.setOptions(options);
+                toastr.info(`Physics ${options.physics.enabled ? 'enabled' : 'disabled'}`);
+            }
+        }
+        
+        // Item actions
+        function analyzeItem(itemId) {
+            const item = allData.find(d => d.id === itemId);
+            if (item) {
+                Swal.fire({
+                    title: 'Item Analysis',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Title:</strong> ${item.title}</p>
+                            <p><strong>Type:</strong> ${item.type}</p>
+                            <p><strong>Risk Level:</strong> ${item.risk_level}</p>
+                            <p><strong>Confidence:</strong> ${item.confidence}%</p>
+                            <p><strong>Relevance:</strong> ${item.relevance}%</p>
+                            <p><strong>Source:</strong> ${item.search_engine || 'duckduckgo'}</p>
+                            <p><strong>Link:</strong> <a href="${item.link}" target="_blank">${item.link}</a></p>
+                            ${item.snippet ? `<p><strong>Snippet:</strong> ${item.snippet}</p>` : ''}
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonText: 'Close',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)'
+                });
+            }
+        }
+        
+        function saveItem(itemId) {
+            const item = allData.find(d => d.id === itemId);
+            if (item) {
+                // In production, save to backend
+                toastr.success('Item saved to your collection');
+            }
+        }
+        
+        function flagItem(itemId) {
+            const item = allData.find(d => d.id === itemId);
+            if (item) {
+                Swal.fire({
+                    title: 'Flag Item',
+                    input: 'textarea',
+                    inputLabel: 'Reason for flagging',
+                    inputPlaceholder: 'Enter your reason here...',
+                    showCancelButton: true,
+                    confirmButtonText: 'Flag',
+                    cancelButtonText: 'Cancel',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // In production, send to backend
+                        toastr.success('Item has been flagged for review');
+                    }
+                });
+            }
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            if (newTheme === 'light') {
+                document.documentElement.style.setProperty('--bg-primary', '#f8f9fa');
+                document.documentElement.style.setProperty('--bg-secondary', '#ffffff');
+                document.documentElement.style.setProperty('--bg-card', '#ffffff');
+                document.documentElement.style.setProperty('--bg-dark', '#e9ecef');
+                document.documentElement.style.setProperty('--text-primary', '#212529');
+                document.documentElement.style.setProperty('--text-secondary', '#6c757d');
+            } else {
+                document.documentElement.style.setProperty('--bg-primary', '#0a0c14');
+                document.documentElement.style.setProperty('--bg-secondary', '#151a27');
+                document.documentElement.style.setProperty('--bg-card', '#1d2436');
+                document.documentElement.style.setProperty('--bg-dark', '#0d1119');
+                document.documentElement.style.setProperty('--text-primary', '#ffffff');
+                document.documentElement.style.setProperty('--text-secondary', '#b0b8d0');
+            }
+            
+            // Save theme preference
+            localStorage.setItem('theme', newTheme);
+            toastr.info(`Switched to ${newTheme} theme`);
+        }
+        
+        // Settings
+        async function showSettings() {
+            try {
+                const response = await fetch('/settings');
+                if (response.ok) {
+                    const result = await response.json();
+                    const settings = result.settings;
+                    
+                    Swal.fire({
+                        title: 'Settings',
+                        html: `
+                            <div class="text-start">
+                                <div class="mb-3">
+                                    <label class="form-label">Default Search Pages:</label>
+                                    <input type="range" class="form-range" id="settingsPages" min="1" max="10" value="${settings.default_pages || 2}">
+                                    <div class="d-flex justify-content-between">
+                                        <small>1</small>
+                                        <span id="settingsPagesValue" class="fw-bold">${settings.default_pages || 2} Pages</span>
+                                        <small>10</small>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Default Search Engine:</label>
+                                    <select class="form-select" id="settingsEngine">
+                                        <option value="duckduckgo" ${(settings.default_search_engine || 'duckduckgo') === 'duckduckgo' ? 'selected' : ''}>DuckDuckGo</option>
+                                        <option value="google" ${(settings.default_search_engine || 'duckduckgo') === 'google' ? 'selected' : ''}>Google</option>
+                                        <option value="bing" ${(settings.default_search_engine || 'duckduckgo') === 'bing' ? 'selected' : ''}>Bing</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Privacy Level:</label>
+                                    <select class="form-select" id="settingsPrivacy">
+                                        <option value="normal" ${(settings.privacy_level || 'medium') === 'normal' ? 'selected' : ''}>Normal</option>
+                                        <option value="enhanced" ${(settings.privacy_level || 'medium') === 'enhanced' ? 'selected' : ''}>Enhanced</option>
+                                        <option value="maximum" ${(settings.privacy_level || 'medium') === 'maximum' ? 'selected' : ''}>Maximum</option>
+                                    </select>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="settingsAutoSave" ${settings.auto_save ? 'checked' : ''}>
+                                    <label class="form-check-label" for="settingsAutoSave">Auto-save results</label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="settingsNotifications" ${settings.notifications !== false ? 'checked' : ''}>
+                                    <label class="form-check-label" for="settingsNotifications">Enable notifications</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Theme:</label>
+                                    <select class="form-select" id="settingsTheme">
+                                        <option value="dark" ${(settings.theme || 'dark') === 'dark' ? 'selected' : ''}>Dark</option>
+                                        <option value="light" ${(settings.theme || 'dark') === 'light' ? 'selected' : ''}>Light</option>
+                                        <option value="auto" ${(settings.theme || 'dark') === 'auto' ? 'selected' : ''}>Auto</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Save',
+                        cancelButtonText: 'Cancel',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-primary)',
+                        preConfirm: () => {
+                            return {
+                                default_pages: parseInt(document.getElementById('settingsPages').value),
+                                default_search_engine: document.getElementById('settingsEngine').value,
+                                privacy_level: document.getElementById('settingsPrivacy').value,
+                                auto_save: document.getElementById('settingsAutoSave').checked,
+                                notifications: document.getElementById('settingsNotifications').checked,
+                                theme: document.getElementById('settingsTheme').value
+                            };
+                        }
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const newSettings = result.value;
+                            
+                            const saveResponse = await fetch('/settings', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(newSettings)
+                            });
+                            
+                            if (saveResponse.ok) {
+                                toastr.success('Settings saved successfully');
+                                
+                                // Apply theme if changed
+                                if (newSettings.theme !== settings.theme) {
+                                    if (newSettings.theme === 'auto') {
+                                        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                        if (prefersDark) {
+                                            document.body.setAttribute('data-theme', 'dark');
+                                        } else {
+                                            document.body.setAttribute('data-theme', 'light');
+                                            toggleTheme(); // Apply light theme
+                                        }
+                                    } else {
+                                        document.body.setAttribute('data-theme', newSettings.theme);
+                                        if (newSettings.theme === 'light') {
+                                            toggleTheme(); // Apply light theme
+                                        }
+                                    }
+                                }
+                            } else {
+                                toastr.error('Failed to save settings');
+                            }
+                        }
+                    });
+                    
+                    // Update pages value in real-time
+                    document.getElementById('settingsPages').addEventListener('input', function() {
+                        document.getElementById('settingsPagesValue').textContent = this.value + ' Pages';
+                    });
+                }
+            } catch (error) {
+                toastr.error(`Error loading settings: ${error.message}`);
+            }
+        }
+        
+        // Filter event listeners
+        document.getElementById('typeFilter').addEventListener('change', applyFilters);
+        document.getElementById('riskFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortByRelevance').addEventListener('change', applyFilters);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up range sliders
+            document.getElementById('searchPages').addEventListener('input', function() {
+                document.getElementById('pagesValue').textContent = this.value + ' Pages';
+            });
+            
+            document.getElementById('resultLimit').addEventListener('input', function() {
+                document.getElementById('limitValue').textContent = this.value + ' results';
+            });
+            
+            document.getElementById('aiAnalysisLevel').addEventListener('input', function() {
+                const levels = {1: 'Basic', 2: 'Standard', 3: 'Advanced'};
+                document.getElementById('aiLevelValue').textContent = levels[this.value];
+            });
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                toggleTheme(); // Apply light theme
+            }
+            
+            // Update active filters count
+            updateActiveFiltersCount();
+            
+            // Welcome message
+            setTimeout(() => {
+                toastr.info('OSINT Intelligence Platform is ready. Enter a search query to begin analysis.', 'Welcome', {
+                    timeOut: 10000,
+                    closeButton: true
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
